@@ -113,14 +113,14 @@
       grid-template-columns: 1fr;
     }
 
-    @media (min-width: 520px) {
+    @media (min-width: 680px) {
       .form-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
       }
 
-      .span-2 {
-        grid-column: span 2;
-      }
+      .span-6 { grid-column: span 6; }
+      .span-3 { grid-column: span 3; }
+      .span-2 { grid-column: span 2; }
     }
 
     form label {
@@ -164,6 +164,28 @@
       min-width: 5.25rem;
       padding-left: 0.55rem;
       padding-right: 0.45rem;
+    }
+
+    .phone-row {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .phone-prefix {
+      display: flex;
+      align-items: center;
+      padding: 0 0.7rem;
+      border: 1px solid #c5d3e6;
+      border-right: 0;
+      border-radius: 7px 0 0 7px;
+      background: #f8fbff;
+      color: var(--primary);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .phone-row input {
+      border-radius: 0 7px 7px 0;
     }
 
     #submissionFeedback {
@@ -225,13 +247,13 @@
       <div id="submissionFeedback" role="alert"></div>
 
       <div class="form-grid">
-        <label class="span-2">Receiver name
+        <label class="span-6">Receiver name
           <input name="receiverName" type="text" required autocomplete="name" data-capitalize="words" />
         </label>
-        <label class="span-2">Address
+        <label class="span-3">Street
           <input name="address" type="text" required autocomplete="street-address" data-capitalize="sentence" />
         </label>
-        <label class="span-2">District
+        <label class="span-3">District
           <select name="city" required>
             <option value="">Select district</option>
             <option value="Bhojpur">Bhojpur</option>
@@ -297,13 +319,19 @@
             <option value="Kanchanpur">Kanchanpur</option>
           </select>
         </label>
-        <label>Contact no.
-          <input name="contactNo" type="tel" required inputmode="tel" autocomplete="tel" />
+        <label class="span-3">Contact no.
+          <div class="phone-row">
+            <span class="phone-prefix">+977</span>
+            <input name="contactNo" type="tel" required inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="98XXXXXXXX" />
+          </div>
         </label>
-        <label>Product
+        <label class="span-3">Email (optional)
+          <input name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+        </label>
+        <label class="span-6">Product
           <input name="product" type="text" required data-capitalize="words" />
         </label>
-        <label>Height
+        <label class="span-2">Height
           <div class="unit-row">
             <input name="heightValue" type="text" required inputmode="decimal" placeholder="e.g. 70" autocomplete="off" />
             <select name="heightUnit" aria-label="Height unit">
@@ -312,7 +340,7 @@
             </select>
           </div>
         </label>
-        <label>Weight
+        <label class="span-2">Weight
           <div class="unit-row">
             <input name="weightValue" type="text" required inputmode="decimal" placeholder="e.g. 65" autocomplete="off" />
             <select name="weightUnit" aria-label="Weight unit">
@@ -321,7 +349,7 @@
             </select>
           </div>
         </label>
-        <label>Size
+        <label class="span-2">Size
           <select name="size" required aria-label="Size">
             <option value="S">S</option>
             <option value="M">M</option>
@@ -331,7 +359,7 @@
             <option value="XXXL">XXXL</option>
           </select>
         </label>
-        <label class="span-2">Payment method
+        <label class="span-6">Payment method
           <select name="paymentMethod" required>
             <option value="esewa">eSewa (9867930748)</option>
             <option value="cod">Cash on delivery</option>
@@ -387,6 +415,9 @@
       if (data.address) data.address = sentenceCase(data.address);
       if (data.product) data.product = titleCaseWords(data.product);
       if (data.size) data.size = titleCaseWords(data.size);
+      if (data.contactNo) data.contactNo = String(data.contactNo).replace(/\D/g, "").slice(0, 10);
+      if (data.email) data.email = String(data.email).trim().toLowerCase();
+      if (!data.email) delete data.email;
       if (data.heightValue != null && data.heightUnit) {
         data.height = `${String(data.heightValue).trim()} ${data.heightUnit}`.trim();
       }

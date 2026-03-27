@@ -279,6 +279,7 @@
       const raw = String(value);
       if (key === "status") return statusText[raw] || titleCaseWords(raw.replace(/_/g, " "));
       if (key === "paymentMethod") return formatPaymentMethod(raw);
+      if (key === "email") return raw.trim().toLowerCase();
       if (key === "contactNo" || key === "height" || key === "weight") return raw.trim();
       if (key === "createdAt") return new Date(value).toLocaleString();
       if (key === "address") return sentenceCase(raw);
@@ -354,6 +355,7 @@
         "address",
         "city",
         "contactNo",
+        "email",
         "product",
         "height",
         "weight",
