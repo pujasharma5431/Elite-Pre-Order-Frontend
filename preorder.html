@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pre-Order Form - Elite Sports Hub</title>
+  <style>
+    :root {
+      --bg: #f0f4fb;
+      --card: #ffffff;
+      --primary: #0055a5;
+      --accent: #ec7a0f;
+      --text: #232e3f;
+      --muted: #5c6a7d;
+      --border: #c9d6ea;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      background: linear-gradient(165deg, #e8f0fb 0%, #f5f7fb 45%, #eef2f8 100%);
+      min-height: 100vh;
+      padding: 0.65rem 0.75rem 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0.85rem 1rem 1rem;
+      box-shadow: 0 8px 28px rgba(15, 45, 90, 0.08);
+      border: 1px solid #dce6f6;
+    }
+
+    .brand {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 0.35rem;
+    }
+
+    .brand img {
+      height: 56px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin: 0 0 0.35rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0 0 0.6rem;
+      line-height: 1.35;
+    }
+
+    .info-block {
+      margin-bottom: 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f8fbff;
+      padding: 0.5rem 0.65rem 0.55rem;
+    }
+
+    .info-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0 0 0.25rem;
+    }
+
+    .info-block .info-inner {
+      padding: 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.45;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.2rem 0.8rem;
+    }
+
+    @media (min-width: 560px) {
+      .info-block .info-inner {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .info-block .info-inner p {
+      margin: 0.2rem 0;
+    }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 0.45rem 0.75rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 520px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .span-2 {
+        grid-column: span 2;
+      }
+    }
+
+    form label {
+      display: grid;
+      gap: 0.2rem;
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: #1a2b3d;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid #c5d3e6;
+      border-radius: 7px;
+      font-size: 0.9rem;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid rgba(0, 85, 165, 0.25);
+      outline-offset: 1px;
+    }
+
+    select {
+      background: #fff;
+    }
+
+    #submissionFeedback {
+      display: none;
+      margin-bottom: 0.45rem;
+      padding: 0.55rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    button[type="submit"] {
+      margin-top: 0.35rem;
+      width: 100%;
+      border: 0;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 9px;
+      padding: 0.65rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    button[type="submit"]:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 85, 165, 0.28);
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin: 0.5rem 0 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <img src="logo.png" alt="Elite Sports Hub" onerror="this.style.display='none';" />
+    </div>
+    <h1>Place a pre-order</h1>
+    <p class="sub">Quick form — fill in your details below.</p>
+
+    <div class="info-block">
+      <p class="info-title">Delivery, payment &amp; notes</p>
+      <div class="info-inner">
+        <p class="highlight">Note: Pre-order item — stock usually within 1 week.</p>
+        <p class="highlight">We will call you to confirm before dispatch.</p>
+        <p>Courier: Nepal Can Move</p>
+        <p>Payment: eSewa <strong>9867930748</strong> or cash on delivery. Send a screenshot after eSewa payment.</p>
+        <p><strong>Elite Sports Hub</strong></p>
+      </div>
+    </div>
+
+    <form id="preorderForm">
+      <div id="submissionFeedback" role="alert"></div>
+
+      <div class="form-grid">
+        <label class="span-2">Receiver name
+          <input name="receiverName" type="text" required autocomplete="name" data-capitalize="words" />
+        </label>
+        <label class="span-2">Address
+          <input name="address" type="text" required autocomplete="street-address" data-capitalize="sentence" />
+        </label>
+        <label class="span-2">District
+          <select name="city" required>
+            <option value="">Select district</option>
+            <option value="Bhojpur">Bhojpur</option>
+            <option value="Dhankuta">Dhankuta</option>
+            <option value="Ilam">Ilam</option>
+            <option value="Jhapa">Jhapa</option>
+            <option value="Khotang">Khotang</option>
+            <option value="Morang">Morang</option>
+            <option value="Sankhuwasabha">Sankhuwasabha</option>
+            <option value="Sunsari">Sunsari</option>
+            <option value="Taplejung">Taplejung</option>
+            <option value="Tehrathum">Tehrathum</option>
+            <option value="Udayapur">Udayapur</option>
+            <option value="Bara">Bara</option>
+            <option value="Dhanusa">Dhanusa</option>
+            <option value="Mahottari">Mahottari</option>
+            <option value="Parsa">Parsa</option>
+            <option value="Rautahat">Rautahat</option>
+            <option value="Saptari">Saptari</option>
+            <option value="Sarlahi">Sarlahi</option>
+            <option value="Siraha">Siraha</option>
+            <option value="Bhaktapur">Bhaktapur</option>
+            <option value="Chitwan">Chitwan</option>
+            <option value="Dhading">Dhading</option>
+            <option value="Dolakha">Dolakha</option>
+            <option value="Kathmandu">Kathmandu</option>
+            <option value="Kavrepalanchok">Kavrepalanchok</option>
+            <option value="Lalitpur">Lalitpur</option>
+            <option value="Makwanpur">Makwanpur</option>
+            <option value="Nuwakot">Nuwakot</option>
+            <option value="Ramechhap">Ramechhap</option>
+            <option value="Rasuwa">Rasuwa</option>
+            <option value="Sindhupalchok">Sindhupalchok</option>
+            <option value="Baglung">Baglung</option>
+            <option value="Gorkha">Gorkha</option>
+            <option value="Kaski">Kaski</option>
+            <option value="Lamjung">Lamjung</option>
+            <option value="Manang">Manang</option>
+            <option value="Mustang">Mustang</option>
+            <option value="Myagdi">Myagdi</option>
+            <option value="Nawalpur">Nawalpur</option>
+            <option value="Parbat">Parbat</option>
+            <option value="Syangja">Syangja</option>
+            <option value="Tanahun">Tanahun</option>
+            <option value="Arghakhanchi">Arghakhanchi</option>
+            <option value="Gulmi">Gulmi</option>
+            <option value="Kapilvastu">Kapilvastu</option>
+            <option value="Parasi">Parasi</option>
+            <option value="Palpa">Palpa</option>
+            <option value="Rupandehi">Rupandehi</option>
+            <option value="Banke">Banke</option>
+            <option value="Bardiya">Bardiya</option>
+            <option value="Dailekh">Dailekh</option>
+            <option value="Jajarkot">Jajarkot</option>
+            <option value="Jumla">Jumla</option>
+            <option value="Kalikot">Kalikot</option>
+            <option value="Mugu">Mugu</option>
+            <option value="Salyan">Salyan</option>
+            <option value="Surkhet">Surkhet</option>
+            <option value="Dolpa">Dolpa</option>
+            <option value="Humla">Humla</option>
+            <option value="Kailali">Kailali</option>
+            <option value="Kanchanpur">Kanchanpur</option>
+          </select>
+        </label>
+        <label>Contact no.
+          <input name="contactNo" type="tel" required inputmode="tel" autocomplete="tel" />
+        </label>
+        <label>Product
+          <input name="product" type="text" required data-capitalize="words" />
+        </label>
+        <label>Height
+          <input name="height" type="text" required />
+        </label>
+        <label>Weight
+          <input name="weight" type="text" required />
+        </label>
+        <label>Size
+          <input name="size" type="text" required data-capitalize="words" />
+        </label>
+        <label class="span-2">Payment method
+          <select name="paymentMethod" required>
+            <option value="esewa">eSewa (9867930748)</option>
+            <option value="cod">Cash on delivery</option>
+          </select>
+        </label>
+      </div>
+
+      <button type="submit">Submit pre-order</button>
+    </form>
+
+    <p class="footer-note">Questions? We’ll reach out after you submit.</p>
+  </div>
+
+  <script>
+    function titleCaseWords(text) {
+      if (text == null || text === "") return "";
+      return String(text)
+        .trim()
+        .split(/\s+/)
+        .map((word) => {
+          if (!word) return word;
+          if (/^\d/.test(word)) return word;
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(" ");
+    }
+
+    function sentenceCase(text) {
+      if (text == null || text === "") return "";
+      const s = String(text).trim();
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    document.querySelectorAll("[data-capitalize]").forEach((el) => {
+      el.addEventListener("blur", () => {
+        const mode = el.getAttribute("data-capitalize");
+        if (mode === "words") el.value = titleCaseWords(el.value);
+        if (mode === "sentence") el.value = sentenceCase(el.value);
+      });
+    });
+
+    document.getElementById("preorderForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      if (data.receiverName) data.receiverName = titleCaseWords(data.receiverName);
+      if (data.address) data.address = sentenceCase(data.address);
+      if (data.product) data.product = titleCaseWords(data.product);
+      if (data.size) data.size = titleCaseWords(data.size);
+      data.status = "received";
+      data.createdAt = new Date().toISOString();
+
+      const response = await fetch("/api/preorders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const feedbackEl = document.getElementById("submissionFeedback");
+      if (response.ok) {
+        feedbackEl.style.display = "block";
+        feedbackEl.style.background = "#ecf7ed";
+        feedbackEl.style.color = "#0a5d26";
+        feedbackEl.style.border = "1px solid #9dd6b0";
+        feedbackEl.textContent = "Thank you! Your pre-order is received. We will call you soon for confirmation and dispatch details.";
+        e.target.reset();
+        setTimeout(() => { feedbackEl.style.display = "none"; }, 8000);
+      } else {
+        const body = await response.text();
+        feedbackEl.style.display = "block";
+        feedbackEl.style.background = "#ffecec";
+        feedbackEl.style.color = "#a41a1a";
+        feedbackEl.style.border = "1px solid #e09d9d";
+        feedbackEl.textContent = "Submission failed: " + body;
+      }
+    });
+  </script>
+</body>
+</html>

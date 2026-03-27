@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Pre-Order Dashboard</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --surface: #fff;
+      --primary: #0a5af5;
+      --success: #1b8d4a;
+      --warning: #d9820b;
+      --danger: #d92f3f;
+      --text: #1f2d41;
+      --muted: #64738a;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(11, 42, 87, 0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid #dfecfd;
+      min-width: 860px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.75rem 0.8rem;
+      border-bottom: 1px solid #f0f4fb;
+      font-size: 0.92rem;
+    }
+
+    th {
+      background: #f6faff;
+      color: #23406d;
+      font-weight: 700;
+    }
+
+    tbody tr:hover {
+      background: #f8fbff;
+    }
+
+    .status-select {
+      width: 100%;
+      border-radius: 7px;
+      border: 1px solid #c5d1e6;
+      padding: 0.45rem;
+    }
+
+    button.refresh {
+      background: #0a5af5;
+      color: #fff;
+      border-radius: 8px;
+      border: none;
+      padding: 0.4rem 0.7rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button.refresh:hover { background: #0849be; }
+
+    @media (max-width: 900px) {
+      th, td { padding: 0.55rem; font-size: 0.8rem; }
+    }
+
+    #orderDetails {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      background: #ffffff;
+      border: 1px solid #d9e7fb;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(13,56,113,0.08);
+      display: none;
+    }
+
+    #orderDetails.is-open {
+      display: block;
+    }
+
+    .order-details-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+
+    #orderDetails h2 {
+      margin: 0;
+      color: #0a5af5;
+      font-size: 1.1rem;
+    }
+
+    .btn-hide-details {
+      border: 1px solid #c8d9f7;
+      background: #fff;
+      color: #123f89;
+      border-radius: 7px;
+      padding: 0.35rem 0.65rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .btn-hide-details:hover {
+      background: #f5f9ff;
+    }
+
+    #orderDetailsContent {
+      font-size: 0.92rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.35rem 1rem;
+    }
+
+    #orderDetailsContent p {
+      margin: 0.25rem 0;
+      color: var(--text);
+    }
+
+    .details {
+      border: 1px solid #c8d9f7;
+      background: #f5f9ff;
+      color: #123f89;
+      border-radius: 7px;
+      padding: 0.35rem 0.55rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .details:hover {
+      background: #e8f1ff;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 0.65rem;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+        margin-bottom: 0.85rem;
+      }
+
+      th, td {
+        padding: 0.55rem;
+      }
+
+      .status-select {
+        font-size: 0.86rem;
+      }
+
+      button.refresh {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.55rem;
+      }
+
+      .details {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Admin: Pre-Order Dashboard</h1>
+    <div class="table-wrap">
+      <table border="1" width="100%" id="orders">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Receiver</th>
+            <th>Product</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="orderDetails" aria-live="polite">
+      <div class="order-details-head">
+        <h2>Order details</h2>
+        <button type="button" class="btn-hide-details" id="hideOrderDetails" hidden>Hide details</button>
+      </div>
+      <div id="orderDetailsContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const statusColors = {
+      received: "#dbeffa",
+      in_progress: "#fff0c6",
+      packed: "#d9f0e5",
+      dispatched: "#d8f0ff",
+    };
+
+    const statusText = {
+      received: "Received",
+      in_progress: "In Progress",
+      packed: "Packed",
+      dispatched: "Dispatched",
+    };
+
+    /** Title case each word; keeps numbers and common separators readable */
+    function titleCaseWords(text) {
+      if (text == null || text === "") return "";
+      return String(text)
+        .trim()
+        .split(/\s+/)
+        .map((word) => {
+          if (!word) return word;
+          if (/^\d/.test(word)) return word;
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(" ");
+    }
+
+    /** First letter of string only (for free-text like address) */
+    function sentenceCase(text) {
+      if (text == null || text === "") return "";
+      const s = String(text).trim();
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function formatPaymentMethod(v) {
+      const m = { esewa: "Esewa", cod: "Cash on delivery" };
+      if (m[String(v).toLowerCase()]) return m[String(v).toLowerCase()];
+      return titleCaseWords(String(v).replace(/_/g, " "));
+    }
+
+    function formatField(key) {
+      return key
+        .replace(/([A-Z])/g, " $1")
+        .split("_")
+        .map((w) => titleCaseWords(w))
+        .join(" ");
+    }
+
+    function formatDetailValue(key, value) {
+      if (value == null || value === "") return "";
+      const raw = String(value);
+      if (key === "status") return statusText[raw] || titleCaseWords(raw.replace(/_/g, " "));
+      if (key === "paymentMethod") return formatPaymentMethod(raw);
+      if (key === "contactNo" || key === "height" || key === "weight") return raw.trim();
+      if (key === "createdAt") return new Date(value).toLocaleString();
+      if (key === "address") return sentenceCase(raw);
+      if (key === "receiverName" || key === "city" || key === "product" || key === "size")
+        return titleCaseWords(raw);
+      return sentenceCase(raw);
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    let selectedOrderId = null;
+    let detailsPanelOpen = false;
+
+    function setDetailsPanel(open) {
+      const container = document.getElementById("orderDetails");
+      const hideBtn = document.getElementById("hideOrderDetails");
+      detailsPanelOpen = open;
+      if (open) {
+        container.classList.add("is-open");
+        container.style.display = "";
+        hideBtn.hidden = false;
+      } else {
+        container.classList.remove("is-open");
+        container.style.display = "none";
+        hideBtn.hidden = true;
+        selectedOrderId = null;
+      }
+    }
+
+    async function loadOrders() {
+      const res = await fetch("/api/preorders");
+      const orders = await res.json();
+      const tbody = document.querySelector("#orders tbody");
+      tbody.innerHTML = "";
+
+      orders.forEach((o) => {
+        const row = document.createElement("tr");
+
+        const isThisOpen = detailsPanelOpen && selectedOrderId === o._id;
+        const btnLabel = isThisOpen ? "Hide details" : "View details";
+
+        row.innerHTML = `
+          <td>${o._id}</td>
+          <td>${titleCaseWords(o.receiverName)}<br><small>${o.contactNo}</small></td>
+          <td>${titleCaseWords(o.product)} / ${titleCaseWords(o.size)}</td>
+          <td>
+            <select data-id="${o._id}" class="status-select" style="background:${ statusColors[o.status] || "#fff"};">
+              <option value="received" ${o.status === "received" ? "selected" : ""}>${statusText.received}</option>
+              <option value="in_progress" ${o.status === "in_progress" ? "selected" : ""}>${statusText.in_progress}</option>
+              <option value="packed" ${o.status === "packed" ? "selected" : ""}>${statusText.packed}</option>
+              <option value="dispatched" ${o.status === "dispatched" ? "selected" : ""}>${statusText.dispatched}</option>
+            </select>
+          </td>
+          <td>${new Date(o.createdAt).toLocaleString()}</td>
+          <td><button type="button" data-order-id="${o._id}" data-order='${encodeURIComponent(JSON.stringify(o))}' class="details">${btnLabel}</button></td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    function renderDetails(order) {
+      const container = document.getElementById("orderDetails");
+      const content = document.getElementById("orderDetailsContent");
+      const keys = [
+        "receiverName",
+        "address",
+        "city",
+        "contactNo",
+        "product",
+        "height",
+        "weight",
+        "size",
+        "paymentMethod",
+        "status",
+        "createdAt",
+      ];
+
+      content.innerHTML = keys
+        .map((key) => {
+          if (!(key in order)) return "";
+          const value = order[key];
+          const display = formatDetailValue(key, value);
+          return `<p>
+              <strong>${escapeHtml(formatField(key))}:</strong>
+              <span style="font-weight:400;">${escapeHtml(display)}</span>
+            </p>`;
+        })
+        .join("");
+
+      selectedOrderId = order._id;
+      setDetailsPanel(true);
+    }
+
+    document.body.addEventListener("change", async (evt) => {
+      if (!evt.target.matches(".status-select")) return;
+      const id = evt.target.dataset.id;
+      const status = evt.target.value;
+      await fetch(`/api/preorders/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      await loadOrders();
+    });
+
+    document.body.addEventListener("click", async (evt) => {
+      const btn = evt.target.closest(".details");
+      if (!btn) return;
+      const order = JSON.parse(decodeURIComponent(btn.dataset.order));
+      const id = btn.dataset.orderId;
+      if (detailsPanelOpen && selectedOrderId === id) {
+        setDetailsPanel(false);
+        await loadOrders();
+        return;
+      }
+      renderDetails(order);
+      await loadOrders();
+    });
+
+    document.getElementById("hideOrderDetails").addEventListener("click", async () => {
+      setDetailsPanel(false);
+      await loadOrders();
+    });
+
+    loadOrders();
+  </script>
+</body>
+</html>
