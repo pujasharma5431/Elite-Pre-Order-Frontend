@@ -225,6 +225,7 @@
 
     const statusColors = {
       received: "#dbeffa",
+      payment_received: "#e6ddff",
       in_progress: "#fff0c6",
       packed: "#d9f0e5",
       dispatched: "#d8f0ff",
@@ -232,6 +233,7 @@
 
     const statusText = {
       received: "Received",
+      payment_received: "Payment Received",
       in_progress: "In Progress",
       packed: "Packed",
       dispatched: "Dispatched",
@@ -334,6 +336,7 @@
           <td>
             <select data-id="${o._id}" class="status-select" style="background:${ statusColors[o.status] || "#fff"};">
               <option value="received" ${o.status === "received" ? "selected" : ""}>${statusText.received}</option>
+              <option value="payment_received" ${o.status === "payment_received" ? "selected" : ""}>${statusText.payment_received}</option>
               <option value="in_progress" ${o.status === "in_progress" ? "selected" : ""}>${statusText.in_progress}</option>
               <option value="packed" ${o.status === "packed" ? "selected" : ""}>${statusText.packed}</option>
               <option value="dispatched" ${o.status === "dispatched" ? "selected" : ""}>${statusText.dispatched}</option>
