@@ -338,6 +338,21 @@
         .replace(/"/g, "&quot;");
     }
 
+    async function describeHttpError(res) {
+      const status = res.status;
+      const raw = await res.text();
+      try {
+        const j = JSON.parse(raw);
+        if (j && j.error) return `${status}: ${j.error}`;
+      } catch (_) {
+        /* not JSON */
+      }
+      const pre = raw.match(/<pre>([\s\S]*?)<\/pre>/i);
+      if (pre && pre[1]) return `${status}: ${pre[1].trim()}`;
+      if (raw.length > 200) return `${status}: ${raw.slice(0, 200)}…`;
+      return `${status}: ${raw.trim() || res.statusText}`;
+    }
+
     let selectedOrderId = null;
     let detailsPanelOpen = false;
 
@@ -447,8 +462,12 @@
         if (!confirm("Delete this order permanently?")) return;
         const res = await fetch(apiUrl(`/api/preorders/${id}`), { method: "DELETE" });
         if (!res.ok) {
-          const txt = await res.text();
-          alert("Delete failed: " + txt);
+          const msg = await describeHttpError(res);
+          const hint =
+            /Cannot DELETE/i.test(msg)
+              ? "\n\nYour API server may be on an older deploy. Redeploy the backend on Render (latest main) so DELETE /api/preorders/:id is available."
+              : "";
+          alert("Delete failed.\n\n" + msg + hint);
           return;
         }
         if (detailsPanelOpen && selectedOrderId === id) setDetailsPanel(false);
