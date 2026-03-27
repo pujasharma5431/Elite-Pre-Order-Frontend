@@ -190,6 +190,123 @@
       display: block;
     }
 
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(15, 35, 65, 0.45);
+      backdrop-filter: blur(4px);
+    }
+
+    .login-overlay[hidden] {
+      display: none !important;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 1.25rem 1.35rem;
+      box-shadow: 0 12px 40px rgba(11, 42, 87, 0.15);
+      border: 1px solid #dfecfd;
+    }
+
+    .login-card h2 {
+      margin: 0 0 0.35rem;
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .login-card p {
+      margin: 0 0 1rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .login-card label {
+      display: grid;
+      gap: 0.3rem;
+      font-weight: 600;
+      font-size: 0.82rem;
+      color: #1a2b3d;
+    }
+
+    .login-card input[type="password"] {
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid #c5d3e6;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .login-card button[type="submit"] {
+      width: 100%;
+      margin-top: 0.85rem;
+      padding: 0.6rem;
+      border: 0;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .login-card button[type="submit"]:hover {
+      filter: brightness(0.95);
+    }
+
+    #loginError {
+      display: none;
+      margin-top: 0.65rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      background: #ffecec;
+      color: #a41a1a;
+      border: 1px solid #e09d9d;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+
+    .admin-header h1 {
+      margin: 0;
+      flex: 1 1 auto;
+      text-align: center;
+    }
+
+    .btn-logout {
+      border: 1px solid #c8d9f7;
+      background: #fff;
+      color: #123f89;
+      border-radius: 7px;
+      padding: 0.35rem 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .btn-logout:hover {
+      background: #f5f9ff;
+    }
+
+    #adminApp[hidden] {
+      display: none !important;
+    }
+
     @media (max-width: 700px) {
       body {
         padding: 0.65rem;
@@ -220,8 +337,25 @@
   </style>
 </head>
 <body>
-  <div class="page">
-    <h1>Admin: Pre-Order Dashboard</h1>
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <h2>Admin sign in</h2>
+      <p>Enter the admin password to manage pre-orders.</p>
+      <form id="loginForm">
+        <label>Password
+          <input type="password" id="adminPassword" name="password" autocomplete="current-password" required />
+        </label>
+        <button type="submit">Sign in</button>
+        <div id="loginError" role="alert"></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="adminApp" class="page" hidden>
+    <div class="admin-header">
+      <h1>Admin: Pre-Order Dashboard</h1>
+      <button type="button" class="btn-logout" id="logoutBtn">Log out</button>
+    </div>
     <div class="table-wrap">
       <table border="1" width="100%" id="orders">
         <thead>
@@ -248,9 +382,47 @@
   </div>
 
   <script>
+    const ADMIN_TOKEN_KEY = "eliteAdminToken";
+
     function apiUrl(path) {
       const base = (window.API_BASE || "").replace(/\/$/, "");
       return base ? `${base}${path}` : path;
+    }
+
+    function getAdminToken() {
+      try {
+        return sessionStorage.getItem(ADMIN_TOKEN_KEY);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function setAdminToken(token) {
+      sessionStorage.setItem(ADMIN_TOKEN_KEY, token);
+    }
+
+    function clearAdminToken() {
+      sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    }
+
+    function authHeaders() {
+      const h = { "Content-Type": "application/json" };
+      const t = getAdminToken();
+      if (t) h.Authorization = `Bearer ${t}`;
+      return h;
+    }
+
+    function showAdminApp() {
+      document.getElementById("loginOverlay").hidden = true;
+      document.getElementById("adminApp").hidden = false;
+    }
+
+    function showLoginScreen() {
+      document.getElementById("adminApp").hidden = true;
+      document.getElementById("loginOverlay").hidden = false;
+      const err = document.getElementById("loginError");
+      err.style.display = "none";
+      err.textContent = "";
     }
 
     const statusColors = {
@@ -373,7 +545,17 @@
     }
 
     async function loadOrders() {
-      const res = await fetch(apiUrl("/api/preorders"));
+      const res = await fetch(apiUrl("/api/preorders"), { headers: authHeaders() });
+      if (res.status === 401) {
+        clearAdminToken();
+        showLoginScreen();
+        return;
+      }
+      if (!res.ok) {
+        const msg = await describeHttpError(res);
+        alert("Could not load orders: " + msg);
+        return;
+      }
       const orders = await res.json();
       const tbody = document.querySelector("#orders tbody");
       tbody.innerHTML = "";
@@ -447,11 +629,16 @@
       if (!evt.target.matches(".status-select")) return;
       const id = evt.target.dataset.id;
       const status = evt.target.value;
-      await fetch(apiUrl(`/api/preorders/${id}/status`), {
+      const res = await fetch(apiUrl(`/api/preorders/${id}/status`), {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({ status }),
       });
+      if (res.status === 401) {
+        clearAdminToken();
+        showLoginScreen();
+        return;
+      }
       await loadOrders();
     });
 
@@ -460,7 +647,15 @@
       if (delBtn) {
         const id = delBtn.dataset.deleteId;
         if (!confirm("Delete this order permanently?")) return;
-        const res = await fetch(apiUrl(`/api/preorders/${id}`), { method: "DELETE" });
+        const res = await fetch(apiUrl(`/api/preorders/${id}`), {
+          method: "DELETE",
+          headers: authHeaders(),
+        });
+        if (res.status === 401) {
+          clearAdminToken();
+          showLoginScreen();
+          return;
+        }
         if (!res.ok) {
           const msg = await describeHttpError(res);
           const hint =
@@ -493,7 +688,51 @@
       await loadOrders();
     });
 
-    loadOrders();
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const password = document.getElementById("adminPassword").value;
+      const errEl = document.getElementById("loginError");
+      errEl.style.display = "none";
+      errEl.textContent = "";
+      const res = await fetch(apiUrl("/api/auth/login"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (!res.ok) {
+        let msg = "Sign in failed";
+        try {
+          const j = await res.json();
+          if (j.error) msg = j.error;
+        } catch (_) {}
+        errEl.textContent = msg;
+        errEl.style.display = "block";
+        return;
+      }
+      const data = await res.json();
+      if (!data.token) {
+        errEl.textContent = "No token returned from server.";
+        errEl.style.display = "block";
+        return;
+      }
+      setAdminToken(data.token);
+      document.getElementById("adminPassword").value = "";
+      showAdminApp();
+      await loadOrders();
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      clearAdminToken();
+      setDetailsPanel(false);
+      showLoginScreen();
+    });
+
+    if (getAdminToken()) {
+      showAdminApp();
+      loadOrders();
+    } else {
+      showLoginScreen();
+    }
   </script>
 </body>
 </html>
