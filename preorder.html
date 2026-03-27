@@ -322,7 +322,14 @@
           </div>
         </label>
         <label>Size
-          <input name="size" type="text" required data-capitalize="words" />
+          <select name="size" required aria-label="Size">
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+            <option value="XXXL">XXXL</option>
+          </select>
         </label>
         <label class="span-2">Payment method
           <select name="paymentMethod" required>
@@ -351,6 +358,8 @@
         .split(/\s+/)
         .map((word) => {
           if (!word) return word;
+          // Preserve all-caps size codes like XL/XXL/XXXL.
+          if (/^[A-Z]{1,5}$/.test(word)) return word;
           if (/^\d/.test(word)) return word;
           return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
         })

@@ -245,6 +245,8 @@
         .split(/\s+/)
         .map((word) => {
           if (!word) return word;
+          // Preserve all-caps size codes like XL/XXL/XXXL.
+          if (/^[A-Z]{1,5}$/.test(word)) return word;
           if (/^\d/.test(word)) return word;
           return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
         })
