@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Pre-Order Dashboard</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <script src="/config.js"></script>
   <style>
     :root {
@@ -690,7 +691,7 @@
 
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const password = document.getElementById("adminPassword").value;
+      const password = document.getElementById("adminPassword").value.trim();
       const errEl = document.getElementById("loginError");
       errEl.style.display = "none";
       errEl.textContent = "";
@@ -701,10 +702,19 @@
       });
       if (!res.ok) {
         let msg = "Sign in failed";
-        try {
-          const j = await res.json();
-          if (j.error) msg = j.error;
-        } catch (_) {}
+        if (res.status === 404) {
+          msg =
+            "Login API not found (404). Redeploy the backend from the latest GitHub code so /api/auth/login exists.";
+        } else if (res.status === 503) {
+          msg = "Admin login is not configured on the server (set ADMIN_PASSWORD).";
+        } else {
+          try {
+            const j = await res.json();
+            if (j.error) msg = j.error;
+          } catch (_) {
+            msg = `Sign in failed (${res.status}).`;
+          }
+        }
         errEl.textContent = msg;
         errEl.style.display = "block";
         return;
