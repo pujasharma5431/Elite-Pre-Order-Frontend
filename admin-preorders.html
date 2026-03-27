@@ -160,6 +160,28 @@
       background: #e8f1ff;
     }
 
+    .action-cell {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .btn-delete {
+      border: 1px solid #f0b4bd;
+      background: #fff5f6;
+      color: #b4232f;
+      border-radius: 7px;
+      padding: 0.35rem 0.55rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .btn-delete:hover {
+      background: #ffe8ea;
+    }
+
     @media (max-width: 700px) {
       body {
         padding: 0.65rem;
@@ -354,7 +376,10 @@
             </select>
           </td>
           <td>${new Date(o.createdAt).toLocaleString()}</td>
-          <td><button type="button" data-order-id="${o._id}" data-order='${encodeURIComponent(JSON.stringify(o))}' class="details">${btnLabel}</button></td>
+          <td class="action-cell">
+            <button type="button" data-order-id="${o._id}" data-order='${encodeURIComponent(JSON.stringify(o))}' class="details">${btnLabel}</button>
+            <button type="button" class="btn-delete" data-delete-id="${o._id}">Delete</button>
+          </td>
         `;
 
         tbody.appendChild(row);
@@ -408,6 +433,21 @@
     });
 
     document.body.addEventListener("click", async (evt) => {
+      const delBtn = evt.target.closest(".btn-delete");
+      if (delBtn) {
+        const id = delBtn.dataset.deleteId;
+        if (!confirm("Delete this order permanently?")) return;
+        const res = await fetch(apiUrl(`/api/preorders/${id}`), { method: "DELETE" });
+        if (!res.ok) {
+          const txt = await res.text();
+          alert("Delete failed: " + txt);
+          return;
+        }
+        if (detailsPanelOpen && selectedOrderId === id) setDetailsPanel(false);
+        await loadOrders();
+        return;
+      }
+
       const btn = evt.target.closest(".details");
       if (!btn) return;
       const order = JSON.parse(decodeURIComponent(btn.dataset.order));
