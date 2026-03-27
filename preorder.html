@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pre-Order Form - Elite Sports Hub</title>
+  <script src="/config.js"></script>
   <style>
     :root {
       --bg: #f0f4fb;
@@ -308,6 +309,11 @@
   </div>
 
   <script>
+    function apiUrl(path) {
+      const base = (window.API_BASE || "").replace(/\/$/, "");
+      return base ? `${base}${path}` : path;
+    }
+
     function titleCaseWords(text) {
       if (text == null || text === "") return "";
       return String(text)
@@ -345,7 +351,7 @@
       data.status = "received";
       data.createdAt = new Date().toISOString();
 
-      const response = await fetch("/api/preorders", {
+      const response = await fetch(apiUrl("/api/preorders"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

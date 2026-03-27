@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Pre-Order Dashboard</title>
+  <script src="/config.js"></script>
   <style>
     :root {
       --bg: #f6f8fc;
@@ -217,6 +218,11 @@
   </div>
 
   <script>
+    function apiUrl(path) {
+      const base = (window.API_BASE || "").replace(/\/$/, "");
+      return base ? `${base}${path}` : path;
+    }
+
     const statusColors = {
       received: "#dbeffa",
       in_progress: "#fff0c6",
@@ -307,7 +313,7 @@
     }
 
     async function loadOrders() {
-      const res = await fetch("/api/preorders");
+      const res = await fetch(apiUrl("/api/preorders"));
       const orders = await res.json();
       const tbody = document.querySelector("#orders tbody");
       tbody.innerHTML = "";
@@ -375,7 +381,7 @@
       if (!evt.target.matches(".status-select")) return;
       const id = evt.target.dataset.id;
       const status = evt.target.value;
-      await fetch(`/api/preorders/${id}/status`, {
+      await fetch(apiUrl(`/api/preorders/${id}/status`), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
