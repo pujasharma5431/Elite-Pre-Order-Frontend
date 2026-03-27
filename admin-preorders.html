@@ -239,6 +239,13 @@
       dispatched: "Dispatched",
     };
 
+    function normalizeStatus(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "_");
+    }
+
     /** Title case each word; keeps numbers and common separators readable */
     function titleCaseWords(text) {
       if (text == null || text === "") return "";
@@ -279,7 +286,10 @@
     function formatDetailValue(key, value) {
       if (value == null || value === "") return "";
       const raw = String(value);
-      if (key === "status") return statusText[raw] || titleCaseWords(raw.replace(/_/g, " "));
+      if (key === "status") {
+        const normalized = normalizeStatus(raw);
+        return statusText[normalized] || titleCaseWords(normalized.replace(/_/g, " "));
+      }
       if (key === "paymentMethod") return formatPaymentMethod(raw);
       if (key === "email") return raw.trim().toLowerCase();
       if (key === "contactNo" || key === "height" || key === "weight") return raw.trim();
@@ -325,6 +335,7 @@
 
       orders.forEach((o) => {
         const row = document.createElement("tr");
+        const rowStatus = normalizeStatus(o.status);
 
         const isThisOpen = detailsPanelOpen && selectedOrderId === o._id;
         const btnLabel = isThisOpen ? "Hide details" : "View details";
@@ -334,12 +345,12 @@
           <td>${titleCaseWords(o.receiverName)}<br><small>${o.contactNo}</small></td>
           <td>${titleCaseWords(o.product)} / ${titleCaseWords(o.size)}</td>
           <td>
-            <select data-id="${o._id}" class="status-select" style="background:${ statusColors[o.status] || "#fff"};">
-              <option value="received" ${o.status === "received" ? "selected" : ""}>${statusText.received}</option>
-              <option value="payment_received" ${o.status === "payment_received" ? "selected" : ""}>${statusText.payment_received}</option>
-              <option value="in_progress" ${o.status === "in_progress" ? "selected" : ""}>${statusText.in_progress}</option>
-              <option value="packed" ${o.status === "packed" ? "selected" : ""}>${statusText.packed}</option>
-              <option value="dispatched" ${o.status === "dispatched" ? "selected" : ""}>${statusText.dispatched}</option>
+            <select data-id="${o._id}" class="status-select" style="background:${ statusColors[rowStatus] || "#fff"};">
+              <option value="received" ${rowStatus === "received" ? "selected" : ""}>${statusText.received}</option>
+              <option value="payment_received" ${rowStatus === "payment_received" ? "selected" : ""}>${statusText.payment_received}</option>
+              <option value="in_progress" ${rowStatus === "in_progress" ? "selected" : ""}>${statusText.in_progress}</option>
+              <option value="packed" ${rowStatus === "packed" ? "selected" : ""}>${statusText.packed}</option>
+              <option value="dispatched" ${rowStatus === "dispatched" ? "selected" : ""}>${statusText.dispatched}</option>
             </select>
           </td>
           <td>${new Date(o.createdAt).toLocaleString()}</td>
