@@ -148,6 +148,24 @@
       background: #fff;
     }
 
+    .unit-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.35rem;
+      align-items: stretch;
+    }
+
+    .unit-row input {
+      min-width: 0;
+    }
+
+    .unit-row select {
+      width: auto;
+      min-width: 4.5rem;
+      padding-left: 0.4rem;
+      padding-right: 0.35rem;
+    }
+
     #submissionFeedback {
       display: none;
       margin-bottom: 0.45rem;
@@ -286,10 +304,22 @@
           <input name="product" type="text" required data-capitalize="words" />
         </label>
         <label>Height
-          <input name="height" type="text" required />
+          <div class="unit-row">
+            <input name="heightValue" type="text" required inputmode="decimal" placeholder="e.g. 70" autocomplete="off" />
+            <select name="heightUnit" aria-label="Height unit">
+              <option value="in" selected>in</option>
+              <option value="cm">cm</option>
+            </select>
+          </div>
         </label>
         <label>Weight
-          <input name="weight" type="text" required />
+          <div class="unit-row">
+            <input name="weightValue" type="text" required inputmode="decimal" placeholder="e.g. 65" autocomplete="off" />
+            <select name="weightUnit" aria-label="Weight unit">
+              <option value="kg" selected>kg</option>
+              <option value="lbs">lbs</option>
+            </select>
+          </div>
         </label>
         <label>Size
           <input name="size" type="text" required data-capitalize="words" />
@@ -348,6 +378,16 @@
       if (data.address) data.address = sentenceCase(data.address);
       if (data.product) data.product = titleCaseWords(data.product);
       if (data.size) data.size = titleCaseWords(data.size);
+      if (data.heightValue != null && data.heightUnit) {
+        data.height = `${String(data.heightValue).trim()} ${data.heightUnit}`.trim();
+      }
+      if (data.weightValue != null && data.weightUnit) {
+        data.weight = `${String(data.weightValue).trim()} ${data.weightUnit}`.trim();
+      }
+      delete data.heightValue;
+      delete data.heightUnit;
+      delete data.weightValue;
+      delete data.weightUnit;
       data.status = "received";
       data.createdAt = new Date().toISOString();
 
