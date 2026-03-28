@@ -1,7 +1,7 @@
 /**
  * Backend API base URL (no trailing slash).
  * On localhost / 127.0.0.1 we use the local Express server (default port 3000).
- * If backend/.env sets PORT=3001 (or another port), change LOCAL_API_PORT below to match.
+ * If backend/.env sets PORT (e.g. 3001 when 3000 is busy), change LOCAL_API_PORT to match.
  */
 (function () {
   const LOCAL_API_PORT = 3000;
