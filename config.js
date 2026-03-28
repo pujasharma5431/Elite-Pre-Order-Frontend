@@ -1,8 +1,13 @@
 /**
- * Public URL of your backend on Render (no trailing slash).
- * Example: https://your-service-name.onrender.com
- *
- * Find it in Render: open your Web Service (not the deploy log link).
- * The public URL is shown at the top, or under Settings → Custom Domains / URL.
+ * Backend API base URL (no trailing slash).
+ * On localhost / 127.0.0.1 we use the local Express server (default port 3000).
+ * If backend/.env sets PORT=3001 (or another port), change LOCAL_API_PORT below to match.
  */
-window.API_BASE = "https://elite-pre-order-backend-1.onrender.com";
+(function () {
+  const LOCAL_API_PORT = 3000;
+  const host = typeof window !== "undefined" ? window.location.hostname : "";
+  const isLocal = host === "localhost" || host === "127.0.0.1";
+  window.API_BASE = isLocal
+    ? `http://localhost:${LOCAL_API_PORT}`
+    : "https://elite-pre-order-backend-1.onrender.com";
+})();
